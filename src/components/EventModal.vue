@@ -27,7 +27,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKey));
     <div class="modal-box">
       <div class="modal-head">
         <span>{{ title }}</span>
-        <button class="btn-ghost" @click="emit('close')">✕</button>
+        <button class="btn-ghost" @click="emit('close')" aria-label="Đóng">✕</button>
       </div>
       <pre class="modal-body">{{ body }}</pre>
     </div>

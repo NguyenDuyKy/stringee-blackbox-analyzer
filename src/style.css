@@ -25,7 +25,7 @@ code { font-family: "Cascadia Code", Consolas, monospace; background: var(--bg3)
 
 /* ── Dropzone ── */
 .dropzone {
-  height: 100vh; display: flex; align-items: center; justify-content: center;
+  height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle at 50% 35%, #1b2330, #0d1117 70%);
 }
 .dropzone.drag { background: radial-gradient(circle at 50% 35%, #243042, #0d1117 70%); }
@@ -45,7 +45,7 @@ code { font-family: "Cascadia Code", Consolas, monospace; background: var(--bg3)
 .btn-ghost:hover { background: #28323f; }
 
 /* ── App layout ── */
-.app { height: 100vh; display: flex; flex-direction: column; }
+.app { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
 .topbar {
   display: flex; align-items: center; gap: 16px; padding: 10px 18px;
   background: var(--bg2); border-bottom: 1px solid var(--border); flex-shrink: 0;
@@ -202,13 +202,188 @@ code { font-family: "Cascadia Code", Consolas, monospace; background: var(--bg3)
 .pager.compact { gap: 8px; padding: 8px 10px; }
 .pager.compact .pager-info { margin-left: 0; order: 3; width: 100%; text-align: center; }
 .pager.compact .pager-nav { margin-left: auto; }
+/* Chọn số bản ghi/trang: 3 nút bấm (không dùng <select> để dropdown không bị cắt ở mép dưới mobile) */
+.size-seg { display: inline-flex; gap: 3px; }
+.size-btn { background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 4px 9px; border-radius: 6px; cursor: pointer; font-size: 12px; line-height: 1.4; }
+.size-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+.size-btn.active { background: var(--accent); color: #03101f; border-color: var(--accent); font-weight: 600; }
 
 /* Modal */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; width: 640px; max-width: 90vw; max-height: 80vh; display: flex; flex-direction: column; }
+.modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; width: 640px; max-width: 90vw; max-height: 80vh; max-height: 85dvh; display: flex; flex-direction: column; }
 .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 600; }
 .modal-body { padding: 16px; overflow: auto; font-family: "Cascadia Code", Consolas, monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+   RESPONSIVE LAYER — style cơ sở là DESKTOP-FIRST, mọi thứ dưới
+   đây phủ lên qua các query max-width / pointer / hover / motion.
+   Hệ breakpoint thống nhất:
+     360 phone nhỏ · 480 phone · 768 (mốc collapse) · 1024 tablet-ngang
+     1600 ultra-wide · max-height:600 phone-ngang
+     pointer:coarse cảm ứng · hover:none phản hồi chạm · reduced-motion
+   Các base-edit dvh/safe-area xem .app/.dropzone/.modal-box ở trên.
+   ============================================================ */
+
+/* ---------- BASE (không media) — an toàn ở mọi bề rộng ---------- */
+/* Tiêu đề modal dài không đẩy nút ✕ ra khỏi màn hình */
+.modal-head { gap: 10px; }
+.modal-head > span { min-width: 0; overflow-wrap: anywhere; }
+.modal-head > .btn-ghost { flex-shrink: 0; }
+/* Chặn cuộn lan ra trang phía sau modal trên iOS */
+.modal-body { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+/* Đệm safe-area cho máy có tai thỏ (cần viewport-fit=cover ở index.html) */
+.modal { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+/* Thanh "← Danh sách" của SessionsView: ẩn mặc định, chỉ hiện ở <=768 */
+.detail-back { display: none; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 0; z-index: 2; }
+.detail-back .btn-ghost { padding: 6px 12px; flex-shrink: 0; }
+.detail-back .db-title { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===== Tablet ngang / laptop nhỏ: giữ 2 pane nhưng thu gọn ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar { width: 300px; }
+  .detail { padding: 16px; }
+  .bar-row .name { width: 180px; }
+  .es-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+/* ===== <=768: MỐC COLLAPSE — phone + tablet dọc ===== */
+@media (max-width: 768px) {
+  /* Topbar: cho xuống dòng, ẩn time-chip (đã có ở Tổng quan) */
+  .topbar { flex-wrap: wrap; row-gap: 8px; column-gap: 10px; padding: 8px 12px; }
+  .time-chip { display: none; }
+  .top-stats { width: 100%; margin-left: 0; order: 5; gap: 10px 14px; }
+  .top-actions { margin-left: auto; }
+
+  /* Tabs: cuộn ngang thay vì cắt mất tab thứ 3 */
+  .tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; white-space: nowrap; padding: 11px 14px; }
+
+  /* Sessions: 1 pane (JS gán class .show-detail) */
+  .sessions { display: block; height: 100%; position: relative; }
+  .sidebar { width: 100%; height: 100%; border-right: none; }
+  .sessions .detail { display: none; }
+  .sessions.show-detail .sidebar { display: none; }
+  .sessions.show-detail .detail { display: block; height: 100%; padding: 0 14px 14px; }
+  .detail-back { display: flex; margin: 0 -14px; }
+  .detail > .empty-hint { display: none; }
+  .sess-item { padding: 14px 13px; }
+  .sess-item::after { content: '›'; margin-left: auto; align-self: center; color: var(--muted); font-size: 18px; }
+
+  /* Chi tiết phiên vừa khít chiều rộng */
+  .es-grid { grid-template-columns: 1fr; }
+  .es-row { flex-wrap: wrap; row-gap: 2px; }
+  .es-label { white-space: normal; flex: 1 1 auto; min-width: 0; }
+  .es-code { flex: 1 1 100%; white-space: normal; overflow: visible; text-overflow: clip; word-break: break-all; }
+  .es-count { margin-left: auto; }
+  .tl-item { padding-left: 26px; }
+  .tl-item::before { left: 9px; }
+  .tl-node { left: 2px; width: 16px; height: 16px; font-size: 9px; top: 10px; }
+  .tl-head { gap: 6px 8px; }
+  .tl-cat { flex-basis: 100%; }
+  .tl-gap { margin-left: 0; }
+  .sess-meta { gap: 6px 16px; }
+  .sess-meta div { flex: 1 1 100%; word-break: break-all; }
+  .diag, .ev-stats { padding: 12px 14px; }
+  .btn-report { display: block; width: 100%; padding: 11px 14px; text-align: center; }
+
+  /* Tổng quan: bar-row xếp tên trên thanh */
+  .ov { padding: 14px 12px; }
+  .panel, .ev-stats { padding: 14px 12px; margin-bottom: 14px; }
+  .bar-row { flex-wrap: wrap; gap: 4px 8px; margin-bottom: 12px; }
+  .bar-row .name { width: 100%; flex: 0 0 100%; flex-shrink: 1; white-space: normal; line-height: 1.3; }
+  .bar-row .track { flex: 1 1 auto; min-width: 0; height: 14px; }
+  .bar-row .num { width: auto; min-width: 44px; flex-shrink: 0; }
+
+  /* Toàn bộ sự kiện: bộ lọc xếp dọc full-width */
+  .all-filters { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 12px; }
+  .all-filters .input { width: 100%; }
+  .all-filters .search-sm { flex: none; width: 100%; min-width: 0; }
+  .time-filter { flex-wrap: wrap; width: 100%; padding-left: 0; gap: 6px 8px; }
+  .time-filter .dt { flex: 1 1 100%; width: 100%; min-width: 0; }
+  .time-filter .tf-label { flex: 1 1 100%; }
+  .time-filter .btn-ghost { flex: 0 0 auto; align-self: flex-start; }
+  .all-count { margin-left: 0; }
+
+  /* Hàng sự kiện: giờ+nhóm dòng 1, nhãn full-width dòng 2 */
+  .all-row { flex-wrap: wrap; gap: 2px 10px; align-items: baseline; }
+  .all-row .t { width: auto; flex: 0 0 auto; }
+  .all-row .c { width: auto; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .all-row .e { flex: 1 1 100%; width: 100%; }
+
+  /* Footer phân trang: nhấc khỏi mép dưới, tôn trọng safe-area (home indicator) */
+  .pager { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+
+/* ===== <=480: phone — tinh chỉnh thêm trên <=768 ===== */
+@media (max-width: 480px) {
+  .brand { font-size: 14px; }
+  .brand span { display: none; }
+  .file-chip:not(.time-chip) { display: none; }
+  .top-stats .ts { font-size: 11px; }
+  .top-stats .ts b { font-size: 13px; }
+  .top-stats .ts:last-child { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .cards { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .card { padding: 12px; }
+  .card .v { font-size: 22px; }
+
+  /* Modal thành bottom-sheet gần full-width */
+  .modal { align-items: flex-end; }
+  .modal-box { width: 100%; max-width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 12px 12px 0 0; }
+}
+
+/* ===== <=360: phone nhỏ — tinh chỉnh dày đặc nhất ===== */
+@media (max-width: 360px) {
+  .tab { font-size: 13px; padding: 10px 10px; }
+  .cards { grid-template-columns: 1fr; }
+  .sessions.show-detail .detail { padding: 0 10px 10px; }
+  .detail-back { margin: 0 -10px; }
+  .all-list { padding: 8px 10px; }
+  .all-row { padding: 7px 8px; }
+  .modal-head { padding: 12px; }
+  .modal-body { padding: 12px; font-size: 11px; }
+  .modal-box { max-height: 95vh; max-height: 95dvh; }
+}
+
+/* ===== Viewport thấp (phone xoay ngang / cửa sổ ngắn) ===== */
+@media (max-height: 600px) {
+  .modal { align-items: flex-start; padding: 8px; }
+  .modal-box { max-height: 96vh; max-height: 96dvh; }
+}
+
+/* ===== Ultra-wide: giới hạn bề rộng Tổng quan cho dễ đọc ===== */
+@media (min-width: 1600px) {
+  .ov { max-width: 1400px; margin-inline: auto; }
+}
+
+/* ===== Cảm ứng: vùng chạm ~44px (gate theo pointer, không theo bề rộng) ===== */
+@media (pointer: coarse) {
+  .pg-btn { width: 44px; height: 44px; font-size: 18px; }
+  .pager-nav { gap: 8px; }
+  .pg-cur { padding: 0 12px; font-size: 14px; }
+  .size-btn { min-height: 40px; padding: 9px 14px; font-size: 15px; }
+  .seg-btn { padding: 11px 8px; min-height: 44px; font-size: 13px; }
+  .chk { min-height: 44px; font-size: 13px; gap: 10px; }
+  .chk input[type="checkbox"] { width: 22px; height: 22px; }
+  .tab { padding: 14px 16px; }
+  .modal-head .btn-ghost { min-width: 44px; min-height: 44px; font-size: 18px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+}
+
+/* ===== Thiết bị chạm: phản hồi :active thay cho :hover không kích hoạt ===== */
+@media (hover: none) {
+  .sess-item:active, .tl-card:active, .all-row:active { background: var(--bg3); }
+  .tl-card:active { border-left-color: var(--accent); }
+  .pg-btn:active:not(:disabled) { background: var(--bg3); border-color: var(--accent); }
+  .seg-btn:active { background: var(--bg3); }
+  .modal-head .btn-ghost:active { background: #28323f; }
+}
+
+/* ===== Tôn trọng prefers-reduced-motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

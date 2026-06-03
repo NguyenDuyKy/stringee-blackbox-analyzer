@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { fmtDateTime } from '../lib/format.js';
 import SessionDetail from './SessionDetail.vue';
 import Pagination from './Pagination.vue';
@@ -12,6 +12,22 @@ const problemOnly = ref(false);
 const selected = ref(null);
 const page = ref(1);
 const pageSize = ref(20);
+
+// Trên mobile: hiển thị 1 pane (danh sách HOẶC chi tiết). matchMedia phải
+// dùng ĐÚNG 768px như breakpoint collapse trong style.css, nếu đổi phải đổi cả hai.
+const isMobile = ref(false);
+let mql;
+function onMql(e) { isMobile.value = e.matches; }
+onMounted(() => {
+  mql = window.matchMedia('(max-width: 768px)');
+  isMobile.value = mql.matches;
+  mql.addEventListener('change', onMql);
+});
+onUnmounted(() => { mql && mql.removeEventListener('change', onMql); });
+
+// .show-detail chỉ bật trên mobile VÀ khi đã chọn một phiên (desktop/tablet giữ 2 pane)
+const showDetail = computed(() => isMobile.value && !!selected.value);
+function backToList() { selected.value = null; }
 
 const TYPES = [
   { key: 'all', label: 'Tất cả' },
@@ -50,7 +66,7 @@ function who(s) {
 </script>
 
 <template>
-  <div class="sessions">
+  <div class="sessions" :class="{ 'show-detail': showDetail }">
     <aside class="sidebar">
       <div class="sb-filters">
         <input v-model="text" class="input" type="text" placeholder="Tìm convId / callId / khách / số…" />
@@ -81,8 +97,12 @@ function who(s) {
     </aside>
 
     <div class="detail">
+      <div class="detail-back" v-if="selected">
+        <button class="btn-ghost" @click="backToList">← Danh sách</button>
+        <span class="db-title">{{ selected.type === 'chat' ? '💬' : '📞' }} {{ who(selected) }}</span>
+      </div>
       <SessionDetail v-if="selected" :session="selected" :key="selected.type + selected.id" />
-      <div v-else class="empty-hint">← Chọn một phiên để xem timeline & chẩn đoán</div>
+      <div v-else class="empty-hint">Chọn một phiên để xem timeline & chẩn đoán</div>
     </div>
   </div>
 </template>
