@@ -28,9 +28,9 @@ const timeSpan = computed(() => {
 });
 
 const TABS = [
-  { key: 'overview', label: 'Tổng quan' },
-  { key: 'sessions', label: 'Phiên (chat/cuộc gọi)' },
-  { key: 'all', label: 'Toàn bộ sự kiện' }
+  { key: 'overview', icon: '📊', label: 'Tổng quan' },
+  { key: 'sessions', icon: '💬', label: 'Phiên (chat/cuộc gọi)' },
+  { key: 'all', icon: '📋', label: 'Toàn bộ sự kiện' }
 ];
 </script>
 
@@ -55,7 +55,7 @@ const TABS = [
 
     <nav class="tabs">
       <button v-for="t in TABS" :key="t.key" class="tab" :class="{ active: tab === t.key }" @click="tab = t.key">
-        {{ t.label }}
+        <span class="tab-icon">{{ t.icon }}</span> {{ t.label }}
       </button>
     </nav>
 

@@ -1,7 +1,6 @@
 # Stringee BlackBox Analyzer (Vue 3)
 
 Web app phân tích log chat / cuộc gọi của agent từ file `stringee_blackbox_*.json`.
-Chạy thẳng trên trình duyệt — **không cần Electron**.
 
 ## Chạy app
 

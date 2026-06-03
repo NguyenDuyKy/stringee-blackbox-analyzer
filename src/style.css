@@ -63,6 +63,7 @@ code { font-family: "Cascadia Code", Consolas, monospace; background: var(--bg3)
 .tab { background: none; border: none; color: var(--muted); padding: 11px 18px; cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.tab-icon { font-size: 15px; }
 
 .main { flex: 1; overflow: hidden; position: relative; }
 .view { position: absolute; inset: 0; overflow: auto; }
